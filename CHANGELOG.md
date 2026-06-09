@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.10.0](https://github.com/santifer/career-ops/compare/career-ops-v1.9.0...career-ops-v1.10.0) (2026-06-09)
+
+
+### Features
+
+* **dashboard:** sortable Location, Pay, and Last-contact columns in pipeline view ([#798](https://github.com/santifer/career-ops/issues/798)) ([265a95b](https://github.com/santifer/career-ops/commit/265a95befd4f5d0b42ecee104446129898f4ad0c))
+
+
+### Bug Fixes
+
+* **dashboard:** resolve tracker-relative report links against the tracker directory ([#780](https://github.com/santifer/career-ops/issues/780)) ([858fc93](https://github.com/santifer/career-ops/commit/858fc9334f38f8767ec3d93cdac4bdb5e754aeff)), closes [#779](https://github.com/santifer/career-ops/issues/779)
+* **doctor:** single source of truth for onboarding state via doctor --json ([#765](https://github.com/santifer/career-ops/issues/765)) ([eb536c4](https://github.com/santifer/career-ops/commit/eb536c49580ba17a9e63064f3893248a4c58c576))
+* **flake:** declare systems so the devShell resolves on macOS ([#848](https://github.com/santifer/career-ops/issues/848)) ([e5f0903](https://github.com/santifer/career-ops/commit/e5f09038e7cd9135db535927db219813d94a71ce)), closes [#334](https://github.com/santifer/career-ops/issues/334)
+* **liveness:** stop false-expiring postings behind anti-bot walls ([#783](https://github.com/santifer/career-ops/issues/783)) ([a667c33](https://github.com/santifer/career-ops/commit/a667c337acc4b68e3e937fd4ce5280bb77b3ce4a))
+* **merge-tracker:** require company match on exact entry-number dedup ([#867](https://github.com/santifer/career-ops/issues/867)) ([10ad2de](https://github.com/santifer/career-ops/commit/10ad2de161f7d45ee51e7895c4a47aa556207cb3))
+* **merge-tracker:** use token-union ratio in roleFuzzyMatch to stop cross-role dedup ([#793](https://github.com/santifer/career-ops/issues/793)) ([cfa7505](https://github.com/santifer/career-ops/commit/cfa750573a8dfbcc3b825311e6c910d51719e54f)), closes [#751](https://github.com/santifer/career-ops/issues/751)
+* **patterns:** parse header-style and Detected-archetype formats in analyze-patterns ([#723](https://github.com/santifer/career-ops/issues/723)) ([abf603c](https://github.com/santifer/career-ops/commit/abf603c885eab6b3741b0cf41297ac2b9a960cc4))
+* **release:** auto-sync VERSION via release-please generic extra-file ([214f5f8](https://github.com/santifer/career-ops/commit/214f5f8a7ca06f8b1225aed49709022e4c9f32e8))
+* **release:** sync VERSION file to 1.9.0 ([461e3d9](https://github.com/santifer/career-ops/commit/461e3d91f6a48419c5b51fa17e6765bf8d174a3c))
+* **update:** use curl in check() so updates work inside the Claude Code sandbox ([#802](https://github.com/santifer/career-ops/issues/802)) ([8cac7f3](https://github.com/santifer/career-ops/commit/8cac7f33deeba69674682c5d77883b0e5b3eaba2)), closes [#754](https://github.com/santifer/career-ops/issues/754)
+
 ## [1.9.0](https://github.com/santifer/career-ops/compare/career-ops-v1.8.0...career-ops-v1.9.0) (2026-06-09)
 
 
