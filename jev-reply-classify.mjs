@@ -27,6 +27,7 @@ try {
 
 const API_URL = 'https://api.typesafe.ai/v1/systemone';
 const CONFIDENCE_FLOOR = 0.6;
+const REQUEST_TIMEOUT_MS = 10_000;
 
 const CATEGORIES = {
   Interview: 'The email invites or schedules an interview, screen, or assessment call with the candidate.',
@@ -59,10 +60,16 @@ export async function classifyReplyWithJev(cand) {
     body: cand.body_snippet || '',
   };
 
+  // One deadline for the whole request, headers and body — fetch() can
+  // resolve as soon as headers arrive, leaving res.json() free to hang on a
+  // stalled body with no timeout of its own.
+  const deadline = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+
   let res;
   try {
     res = await fetch(API_URL, {
       method: 'POST',
+      signal: deadline,
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
@@ -89,7 +96,7 @@ export async function classifyReplyWithJev(cand) {
     });
   } catch (err) {
     console.error(`jev-reply-classify: request failed — ${err.message}`);
-    return null; // network failure — fail closed, caller keeps 'Unknown'
+    return null; // network failure or timeout — fail closed, caller keeps 'Unknown'
   }
 
   if (!res.ok) {
@@ -102,7 +109,7 @@ export async function classifyReplyWithJev(cand) {
     data = await res.json();
   } catch (err) {
     console.error(`jev-reply-classify: could not parse response — ${err.message}`);
-    return null;
+    return null; // includes abort mid-body-read once the deadline fires
   }
 
   const answer = data?.answers?.category;
@@ -110,7 +117,9 @@ export async function classifyReplyWithJev(cand) {
   if (typeof answer.confidence === 'number' && answer.confidence < CONFIDENCE_FLOOR) return null;
   if (!(answer.choice in CATEGORIES) || answer.choice === 'Unknown') return null;
 
-  const hasSchedulingAsk = data?.answers?.hasSchedulingAsk?.probability > 0.6;
+  const schedulingProbability = data?.answers?.hasSchedulingAsk?.noul;
+  if (answer.choice === 'Need Action' && !Number.isFinite(schedulingProbability)) return null;
+  const hasSchedulingAsk = schedulingProbability > CONFIDENCE_FLOOR;
 
   const suggestedTrackerUpdate = {
     Interview: 'Interview',
