@@ -76,19 +76,32 @@ export async function classifyReplyWithJev(cand) {
             instructions: 'This is an email a job applicant received. Which category best describes it?',
             criteria: CATEGORIES,
           },
+          // Asked alongside category (independent, same state) rather than as
+          // a follow-up request — the deterministic matcher uses this same
+          // signal to route 'Need Action' to Interview vs Responded, so Jev's
+          // fallback needs it too, not just the top-level category.
+          hasSchedulingAsk: {
+            type: 'noul',
+            instructions: 'Does the email ask the candidate to pick, book, or confirm a specific interview or call time/slot?',
+          },
         },
       }),
     });
-  } catch {
+  } catch (err) {
+    console.error(`jev-reply-classify: request failed — ${err.message}`);
     return null; // network failure — fail closed, caller keeps 'Unknown'
   }
 
-  if (!res.ok) return null;
+  if (!res.ok) {
+    console.error(`jev-reply-classify: API returned ${res.status} ${res.statusText}`);
+    return null;
+  }
 
   let data;
   try {
     data = await res.json();
-  } catch {
+  } catch (err) {
+    console.error(`jev-reply-classify: could not parse response — ${err.message}`);
     return null;
   }
 
@@ -97,10 +110,12 @@ export async function classifyReplyWithJev(cand) {
   if (typeof answer.confidence === 'number' && answer.confidence < CONFIDENCE_FLOOR) return null;
   if (!(answer.choice in CATEGORIES) || answer.choice === 'Unknown') return null;
 
+  const hasSchedulingAsk = data?.answers?.hasSchedulingAsk?.probability > 0.6;
+
   const suggestedTrackerUpdate = {
     Interview: 'Interview',
     Responded: 'Responded',
-    'Need Action': 'Responded',
+    'Need Action': hasSchedulingAsk ? 'Interview' : 'Responded',
     Rejected: 'Rejected',
     Offer: 'Offer',
     'Auto-confirmation': 'none',
